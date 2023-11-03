@@ -11,8 +11,8 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.*;
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 
 public class Frame1 extends JFrame {
     JPanel contentPane;
@@ -37,7 +37,7 @@ public class Frame1 extends JFrame {
     JList classList = new JList();
     JScrollPane jScrollPane3 = new JScrollPane();
     JScrollPane jScrollPane1 = new JScrollPane();
-    JList jList2 = new JList();
+    JList methodList = new JList();
     JPanel jPanel2 = new JPanel();
     BorderLayout borderLayout3 = new BorderLayout();
     JPanel jPanel3 = new JPanel();
@@ -73,10 +73,9 @@ public class Frame1 extends JFrame {
     }
 
     private void jbInit() throws Exception {
-
+        this.contentPane = (JPanel)this.getContentPane();
         this.contentPane.setLayout(this.borderLayout1);
         this.contentPane.add(this.jToolBar, "North");
-        this.contentPane.add(this.jScrollPane2, "South");
         this.setSize(new Dimension(508, 513));
         this.setTitle("WWL FUNCTIONAL TESTING TOOL");
 
@@ -115,7 +114,8 @@ public class Frame1 extends JFrame {
 
         // LISTS
         this.classList.setFont(new Font("Dialog", 0, 20));
-        this.jList2.setFont(new Font("Dialog", 0, 20));
+        this.classList.addListSelectionListener(new ClassList_click_actionAdapter(this));
+        this.methodList.setFont(new Font("Dialog", 0, 20));
 
         // PANES AND PANELS
         this.jScrollPane1.getViewport().add(this.classList, (Object)null);
@@ -123,7 +123,7 @@ public class Frame1 extends JFrame {
         this.jScrollPane2.getViewport().add(this.jTextArea1);
         this.jScrollPane2.setPreferredSize(new Dimension(2, 90));
         this.jScrollPane3.setPreferredSize(new Dimension(258, 150));
-        this.jScrollPane3.getViewport().add(this.jList2, (Object)null);
+        this.jScrollPane3.getViewport().add(this.methodList, (Object)null);
         this.jPanel2.setLayout(this.borderLayout3);
         this.jPanel2.setMinimumSize(new Dimension(220, 163));
         this.jPanel2.setPreferredSize(new Dimension(258, 163));
@@ -246,6 +246,11 @@ public class Frame1 extends JFrame {
         return str;
     }*/
 
+    void classList_actionPerformed(ListSelectionEvent e){
+        String[] str = {"e","2"};
+            this.methodList.setListData(str);
+    }
+
     void newObject_actionPerformed(ActionEvent e) {
         int idx = this.classList.getSelectedIndex();
         Class[] cls = this.cons[idx].getParameterTypes();
@@ -260,7 +265,7 @@ public class Frame1 extends JFrame {
     }
 
     void run_actionPerformed(ActionEvent e) {
-        int idx = this.jList2.getSelectedIndex();
+        int idx = this.methodList.getSelectedIndex();
         Class[] cls = this.mtd[idx].getParameterTypes();
         Object[] obj = this.class2object(cls);
 
