@@ -56,7 +56,16 @@ public class Frame1 extends JFrame {
         this.enableEvents(64L);
 
         try {
+
             this.jbInit();
+
+            JViewport jvp = new JViewport();
+            // TODO: Make method use counters and add those to jvp
+            String methodUseCount = "1\n2\n3\n";// TEST
+            JTextArea rowText = new JTextArea(methodUseCount);
+            jvp.add(rowText);
+            jScrollPane3.setRowHeader(jvp);
+
         } catch (Exception var2) {
             var2.printStackTrace();
         }
@@ -64,75 +73,90 @@ public class Frame1 extends JFrame {
     }
 
     private void jbInit() throws Exception {
-        //this.image1 = new ImageIcon((class$functionalTest$Frame1 == null ? (class$functionalTest$Frame1 = class$("functionalTest.Frame1")) : class$functionalTest$Frame1).getResource("openFile.png"));
-        //this.image2 = new ImageIcon((class$functionalTest$Frame1 == null ? (class$functionalTest$Frame1 = class$("functionalTest.Frame1")) : class$functionalTest$Frame1).getResource("closeFile.png"));
-        //this.image3 = new ImageIcon((class$functionalTest$Frame1 == null ? (class$functionalTest$Frame1 = class$("functionalTest.Frame1")) : class$functionalTest$Frame1).getResource("help.png"));
-        this.contentPane = (JPanel)this.getContentPane();
+
         this.contentPane.setLayout(this.borderLayout1);
+        this.contentPane.add(this.jToolBar, "North");
+        this.contentPane.add(this.jScrollPane2, "South");
         this.setSize(new Dimension(508, 513));
         this.setTitle("WWL FUNCTIONAL TESTING TOOL");
+
+        // MENU ITEMS
         this.jMenuFile.setText("File");
+        this.jMenuFile.add(this.jMenuFileExit);
         this.jMenuFileExit.setText("Exit");
         this.jMenuFileExit.addActionListener(new Frame1_jMenuFileExit_ActionAdapter(this));
         this.jMenuHelp.setText("Help");
+        this.jMenuHelp.add(this.jMenuHelpAbout);
         this.jMenuHelpAbout.setText("About");
         this.jMenuHelpAbout.addActionListener(new Frame1_jMenuHelpAbout_ActionAdapter(this));
+        this.jMenuBar1.add(this.jMenuFile);
+        this.jMenuBar1.add(this.jMenuHelp);
+        this.setJMenuBar(this.jMenuBar1);
+
+        // TOOLBAR AND BUTTONS
         this.jButton1.setIcon(this.image1);
         this.jButton1.setToolTipText("Open File");
         this.jButton2.setIcon(this.image2);
         this.jButton2.setToolTipText("Close File");
         this.jButton3.setIcon(this.image3);
         this.jButton3.setToolTipText("Help");
-        this.jTextField1.setFont(new Font("Dialog", 0, 20));
-        this.jTextField1.setMaximumSize(new Dimension(201, Integer.MAX_VALUE));
-        this.jTextField1.setPreferredSize(new Dimension(201, 31));
-        this.jTextField1.setText("functionalTest.Box");
-        this.jTextField1.addActionListener(new Frame1_jTextField1_actionAdapter(this));
-        this.jScrollPane3.setPreferredSize(new Dimension(258, 150));
-        this.jPanel2.setLayout(this.borderLayout3);
-        this.jPanel2.setMinimumSize(new Dimension(220, 163));
-        this.jPanel2.setPreferredSize(new Dimension(258, 163));
-        this.newObject.setText("New Object");
-        this.newObject.addActionListener(new Frame1_newObject_actionAdapter(this));
-        this.jLabel1.setText("Constructors");
-        this.jPanel4.setLayout(this.borderLayout4);
-        this.jLabel2.setRequestFocusEnabled(true);
-        this.jLabel2.setText("Methods");
-        this.run.setText("Run");
-        this.run.addActionListener(new Frame1_run_actionAdapter(this));
-        this.jLabel3.setFont(new Font("Dialog", 0, 20));
-        this.jLabel3.setText("   Tested Class:");
-        this.classList.setFont(new Font("Dialog", 0, 20));
-        this.jList2.setFont(new Font("Dialog", 0, 20));
-        this.jTextArea1.setText("");
-        this.jScrollPane2.setMinimumSize(new Dimension(19, 90));
-        this.jScrollPane2.setPreferredSize(new Dimension(2, 90));
         this.jToolBar.add(this.jButton1);
         this.jToolBar.add(this.jButton2);
         this.jToolBar.add(this.jButton3);
         this.jToolBar.add(this.jLabel3, (Object)null);
         this.jToolBar.add(this.jTextField1, (Object)null);
-        this.contentPane.add(this.jSplitPane1, "Center");
-        this.jPanel3.add(this.jLabel1, (Object)null);
-        this.jPanel3.add(this.newObject, (Object)null);
-        this.jSplitPane1.add(this.jPanel4, "right");
+
+        // TEXT FIELDS
+        this.jTextField1.setFont(new Font("Dialog", 0, 20));
+        this.jTextField1.setMaximumSize(new Dimension(201, Integer.MAX_VALUE));
+        this.jTextField1.setPreferredSize(new Dimension(201, 31));
+        this.jTextField1.setText("functionalTest.Box");
+        this.jTextField1.addActionListener(new Frame1_jTextField1_actionAdapter(this));
+
+        // LISTS
+        this.classList.setFont(new Font("Dialog", 0, 20));
+        this.jList2.setFont(new Font("Dialog", 0, 20));
+
+        // PANES AND PANELS
+        this.jScrollPane1.getViewport().add(this.classList, (Object)null);
+        this.jScrollPane2.setMinimumSize(new Dimension(19, 90));
+        this.jScrollPane2.getViewport().add(this.jTextArea1);
+        this.jScrollPane2.setPreferredSize(new Dimension(2, 90));
+        this.jScrollPane3.setPreferredSize(new Dimension(258, 150));
+        this.jScrollPane3.getViewport().add(this.jList2, (Object)null);
+        this.jPanel2.setLayout(this.borderLayout3);
+        this.jPanel2.setMinimumSize(new Dimension(220, 163));
+        this.jPanel2.setPreferredSize(new Dimension(258, 163));
         this.jPanel2.add(this.jScrollPane1, "Center");
         this.jPanel2.add(this.jPanel3, "North");
-        this.jScrollPane1.getViewport().add(this.classList, (Object)null);
+        this.jPanel3.add(this.jLabel1, (Object)null);
+        this.jPanel3.add(this.newObject, (Object)null);
+        this.jPanel4.setLayout(this.borderLayout4);
+        this.jPanel4.add(this.jScrollPane3, "Center");
+        this.jPanel4.add(this.jPanel5, "North");
         this.jPanel5.add(this.jLabel2, (Object)null);
         this.jPanel5.add(this.run, (Object)null);
+        this.jSplitPane1.add(this.jPanel4, "right");
         this.jSplitPane1.add(this.jPanel2, "left");
-        this.jPanel4.add(this.jScrollPane3, "Center");
-        this.jScrollPane3.getViewport().add(this.jList2, (Object)null);
-        this.jMenuFile.add(this.jMenuFileExit);
-        this.jMenuHelp.add(this.jMenuHelpAbout);
-        this.jMenuBar1.add(this.jMenuFile);
-        this.jMenuBar1.add(this.jMenuHelp);
-        this.setJMenuBar(this.jMenuBar1);
-        this.jPanel4.add(this.jPanel5, "North");
-        this.contentPane.add(this.jToolBar, "North");
-        this.contentPane.add(this.jScrollPane2, "South");
-        this.jScrollPane2.getViewport().add(this.jTextArea1);
+
+        // NEW OBJECT
+        this.newObject.setText("New Object");
+        this.newObject.addActionListener(new Frame1_newObject_actionAdapter(this));
+
+        // LABELS
+        this.jLabel1.setText("Constructors");
+        this.jLabel2.setRequestFocusEnabled(true);
+        this.jLabel2.setText("Methods");
+        this.jLabel3.setFont(new Font("Dialog", 0, 20));
+        this.jLabel3.setText("   Tested Class:");
+
+        // not sure where these need to go just yet
+        this.run.setText("Run");
+        this.run.addActionListener(new Frame1_run_actionAdapter(this));
+        this.jTextArea1.setText("");
+        this.contentPane.add(this.jSplitPane1, "Center");
+
+
     }
 
     public void jMenuFileExit_actionPerformed(ActionEvent e) {
@@ -169,8 +193,6 @@ public class Frame1 extends JFrame {
     }
 
     void jTextField1_actionPerformed(ActionEvent e) {
-        ArrayList<String> parentList = new ArrayList<String>();
-        String parent;
 
         try {
             //Get list of files in directory
@@ -195,80 +217,7 @@ public class Frame1 extends JFrame {
             }
             this.classList.setListData(fileNameList);
 
-            // removing the ".class" suffix
-            /*String fileName = f.getName().split("\\.")[0];
 
-            //Get parent file name and add it to list
-            parent = f.getParentFile().getName();
-            parentList.add(parent);
-
-            // add parent files until the "classes" file is reached
-            while(!parent.equals("classes") && !parent.equals("production")){
-                f = f.getParentFile();
-                parent = f.getParentFile().getName();
-                parentList.add(parent);
-            }
-
-
-            Class c = null;
-            boolean done = false;
-
-            //Get correct URL
-            URL url = f.getParentFile().toURI().toURL();
-            URL[] urla = {url};
-            URLClassLoader ucl = new URLClassLoader(urla);
-
-            //Loop to find correct file name
-            while(!done){
-
-                URL[] urlList = ucl.getURLs();
-                for (URL urlElement: urlList ) {
-                    System.out.println(urlElement);
-                }
-
-
-                //Initial try is base file name only, no package
-                try{
-                    c = Class.forName(fileName, true, ucl);
-                    done = true;
-                }
-                catch (Exception fileException){
-                    System.out.println(fileException);
-                }
-                catch (NoClassDefFoundError err){}
-
-                //Add the parent file to file name, file is in a package
-                fileName = parentList.get(0) + "." + fileName;
-                parentList.remove(0);
-            }
-
-            this.cons = c.getDeclaredConstructors();
-            String[] str = new String[this.cons.length];
-
-            int i;
-            Class[] cls;
-            int j;
-            for(i = 0; i < this.cons.length; ++i) {
-                cls = this.cons[i].getParameterTypes();
-                str[i] = Modifier.toString(this.cons[i].getModifiers()) + " " + this.cons[i].getDeclaringClass().getSimpleName() + "(";
-
-                //Get all parameters for the constructor
-                str[i] = buildParamList(cls,str[i]) + ")";
-            }
-
-            this.jList1.setListData(str);
-            this.mtd = c.getDeclaredMethods();
-            str = new String[this.mtd.length];
-
-            for(i = 0; i < this.mtd.length; ++i) {
-                cls = this.mtd[i].getParameterTypes();
-                str[i] = Modifier.toString(this.mtd[i].getModifiers()) + " " + this.mtd[i].getReturnType().getName() + " " + this.mtd[i].getName() + "(";
-
-                //Get all parameters for the method
-                str[i] = buildParamList(cls,str[i]) + ")";
-            }
-
-            this.jList2.setListData(str);*/
         } catch (Exception var7) {
             System.out.println(var7);
         }
@@ -276,7 +225,7 @@ public class Frame1 extends JFrame {
     }
 
 
-    private String buildParamList(Class[] cls, String str){
+    /*private String buildParamList(Class[] cls, String str){
         int count = 1;
         for(int j = 0; j < cls.length; ++j) {
             if (j == cls.length - 1) {
@@ -295,7 +244,7 @@ public class Frame1 extends JFrame {
         }
 
         return str;
-    }
+    }*/
 
     void newObject_actionPerformed(ActionEvent e) {
         int idx = this.classList.getSelectedIndex();
