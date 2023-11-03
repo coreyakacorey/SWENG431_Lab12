@@ -3,8 +3,6 @@
 // (powered by FernFlower decompiler)
 //
 
-package functionalTest;
-
 import java.awt.Color;
 
 public class Box {
