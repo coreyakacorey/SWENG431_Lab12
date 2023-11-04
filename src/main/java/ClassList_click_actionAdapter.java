@@ -3,6 +3,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
 
 public class ClassList_click_actionAdapter implements ListSelectionListener {
     Frame1 adaptee;
@@ -14,7 +15,11 @@ public class ClassList_click_actionAdapter implements ListSelectionListener {
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        this.adaptee.classList_actionPerformed(e);
+        try {
+            this.adaptee.classList_actionPerformed(e);
+        } catch (MalformedURLException ex) {
+            throw new RuntimeException(ex);
+        }
 
     }
 }

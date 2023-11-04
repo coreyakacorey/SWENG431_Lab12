@@ -9,8 +9,12 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 
@@ -37,20 +41,23 @@ public class Frame1 extends JFrame {
     JList classList = new JList();
     JScrollPane jScrollPane3 = new JScrollPane();
     JScrollPane jScrollPane1 = new JScrollPane();
-    JList methodList = new JList();
+    //JList methodList = new JList();
     JPanel jPanel2 = new JPanel();
     BorderLayout borderLayout3 = new BorderLayout();
     JPanel jPanel3 = new JPanel();
-    JButton newObject = new JButton();
-    JLabel jLabel1 = new JLabel();
+    //JButton newObject = new JButton();
+    //JLabel jLabel1 = new JLabel();
     JPanel jPanel4 = new JPanel();
     BorderLayout borderLayout4 = new BorderLayout();
     JPanel jPanel5 = new JPanel();
-    JLabel jLabel2 = new JLabel();
-    JButton run = new JButton();
+    //JLabel jLabel2 = new JLabel();
+    //JButton run = new JButton();
     JLabel jLabel3 = new JLabel();
     JScrollPane jScrollPane2 = new JScrollPane();
     JTextArea jTextArea1 = new JTextArea();
+
+    //For trying to clear the JList
+    DefaultListModel listModel = new DefaultListModel<>();
 
     public Frame1() {
         this.enableEvents(64L);
@@ -115,7 +122,8 @@ public class Frame1 extends JFrame {
         // LISTS
         this.classList.setFont(new Font("Dialog", 0, 20));
         this.classList.addListSelectionListener(new ClassList_click_actionAdapter(this));
-        this.methodList.setFont(new Font("Dialog", 0, 20));
+        this.classList.setModel(listModel);
+        //this.methodList.setFont(new Font("Dialog", 0, 20));
 
         // PANES AND PANELS
         this.jScrollPane1.getViewport().add(this.classList, (Object)null);
@@ -123,36 +131,36 @@ public class Frame1 extends JFrame {
         this.jScrollPane2.getViewport().add(this.jTextArea1);
         this.jScrollPane2.setPreferredSize(new Dimension(2, 90));
         this.jScrollPane3.setPreferredSize(new Dimension(258, 150));
-        this.jScrollPane3.getViewport().add(this.methodList, (Object)null);
+        this.jScrollPane3.getViewport().add(this.jTextArea1, (Object)null);
         this.jPanel2.setLayout(this.borderLayout3);
         this.jPanel2.setMinimumSize(new Dimension(220, 163));
         this.jPanel2.setPreferredSize(new Dimension(258, 163));
         this.jPanel2.add(this.jScrollPane1, "Center");
         this.jPanel2.add(this.jPanel3, "North");
-        this.jPanel3.add(this.jLabel1, (Object)null);
-        this.jPanel3.add(this.newObject, (Object)null);
+        //this.jPanel3.add(this.jLabel1, (Object)null);
+        //this.jPanel3.add(this.newObject, (Object)null);
         this.jPanel4.setLayout(this.borderLayout4);
         this.jPanel4.add(this.jScrollPane3, "Center");
         this.jPanel4.add(this.jPanel5, "North");
-        this.jPanel5.add(this.jLabel2, (Object)null);
-        this.jPanel5.add(this.run, (Object)null);
+        //this.jPanel5.add(this.jLabel2, (Object)null);
+        //this.jPanel5.add(this.run, (Object)null);
         this.jSplitPane1.add(this.jPanel4, "right");
         this.jSplitPane1.add(this.jPanel2, "left");
 
         // NEW OBJECT
-        this.newObject.setText("New Object");
-        this.newObject.addActionListener(new Frame1_newObject_actionAdapter(this));
+        //this.newObject.setText("New Object");
+        //this.newObject.addActionListener(new Frame1_newObject_actionAdapter(this));
 
         // LABELS
-        this.jLabel1.setText("Constructors");
-        this.jLabel2.setRequestFocusEnabled(true);
-        this.jLabel2.setText("Methods");
+        //this.jLabel1.setText("Constructors");
+        //this.jLabel2.setRequestFocusEnabled(true);
+        //this.jLabel2.setText("Methods");
         this.jLabel3.setFont(new Font("Dialog", 0, 20));
         this.jLabel3.setText("   Tested Class:");
 
         // not sure where these need to go just yet
-        this.run.setText("Run");
-        this.run.addActionListener(new Frame1_run_actionAdapter(this));
+       // this.run.setText("Run");
+        //this.run.addActionListener(new Frame1_run_actionAdapter(this));
         this.jTextArea1.setText("");
         this.contentPane.add(this.jSplitPane1, "Center");
 
@@ -192,63 +200,139 @@ public class Frame1 extends JFrame {
         return obj;
     }
 
+    //List for class files in the chosen directory
+    ArrayList<File> directoryContents = new ArrayList<>();
     void jTextField1_actionPerformed(ActionEvent e) {
 
         try {
             //Get list of files in directory
-            File f = new File("out\\production\\SWENG431_Lab08");
-            System.out.println(f.listFiles());
+            File f;
             JFileChooser jfc = new JFileChooser(this.jTextField1.getText());
+
+            //Get only directories
             jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             jfc.setAcceptAllFileFilterUsed(false);
-            File[] directoryContents = null;
+
+
+
             if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 f = jfc.getSelectedFile();
-                directoryContents = f.listFiles();
-            }
 
-            String[] fileNameList = new String[directoryContents.length];
-
-            for(int i  = 0; i < fileNameList.length; i++){
-                if(! directoryContents[i].isDirectory()) {
-                    // only add files and not directories to the list
-                    fileNameList[i] = directoryContents[i].getName();
+                //Add file to list if it is a ".class" file only
+                for (File file:f.listFiles()) {
+                    if(file.getName().contains(".class")){
+                        directoryContents.add(file);
+                    }
                 }
             }
-            this.classList.setListData(fileNameList);
 
+            String[] fileNameList = new String[directoryContents.size()];
+
+            for(int i  = 0; i < fileNameList.length; i++){
+                fileNameList[i] = directoryContents.get(i).getName();
+            }
+
+            //Not sure how to clear the list, this doesn't work
+            this.listModel.clear();
+
+            this.classList.setListData(fileNameList);
 
         } catch (Exception var7) {
             System.out.println(var7);
         }
-
     }
 
+    void classList_actionPerformed(ListSelectionEvent e) throws MalformedURLException {
+        Class c = null;
+        ArrayList<String> classPath = new ArrayList<>();
 
-    /*private String buildParamList(Class[] cls, String str){
-        int count = 1;
-        for(int j = 0; j < cls.length; ++j) {
-            if (j == cls.length - 1) {
+        for(int i = 0; i < directoryContents.size(); i++){
+            //Get file
+            File f = directoryContents.get(i);
 
-                //Check for String array, cannot use first char as parameter name (will be c nto sa)
-                if(cls[j].getTypeName().equals("java.lang.String[]")){
-                    System.out.print(cls[j].getTypeName() + "  sa" + count);
-                    count++;
+            //Check if the file is the correct one
+            Object str = this.classList.getSelectedValue();
+            if(f.getName().contains((String)str))
+            {
+                //Get the classpath, package and class, and the parent class path
+                while(!f.getName().split("/")[0].contains("classes")){
+                    classPath.add(f.getName().split("/")[0]);
+                    f = f.getParentFile();
                 }
 
-                str = str + cls[j].getName() + " " + cls[j].toString().charAt(0) + count;
-            } else {
-                str = str + cls[j].getName() + " " + cls[j].toString().charAt(0) + count + ",";
-                count++;
+                //Set up the URLClassLoader
+                URL url = f.toURI().toURL();
+                URL[] urla = {url};
+                URLClassLoader ucl = new URLClassLoader(urla);
+
+                String fileName = "";
+
+                //Construct the correct fully qualified class path
+                for(int j = classPath.size(); j > 0; j--){
+                    if(j != 1) {
+                        fileName += classPath.get(j - 1) + ".";
+                    }
+                    else {
+                        fileName += classPath.get(j - 1).split("\\.")[0];
+                    }
+                }
+
+                //Try to open class and get methods
+                try{
+                    c = Class.forName(fileName, true, ucl);
+
+                    if(fileName.contains(".")){
+                        this.jTextArea1.setText("package " + fileName.split("\\.")[0] + ";\n\n");
+                        this.jTextArea1.append(Modifier.toString(c.getModifiers()) + " class " +c.getSimpleName() + "{\n\n");
+                    }
+                    else
+                    {
+                        this.jTextArea1.setText(Modifier.toString(c.getModifiers()) + " class " +c.getSimpleName() + "{\n\n");
+                    }
+
+                    Constructor[] constuctors = c.getDeclaredConstructors();
+
+                    for (Constructor contructor:constuctors) {
+                        this.jTextArea1.append("    " + Modifier.toString(contructor.getModifiers()) + " " + contructor.getDeclaringClass().getSimpleName() + "();"
+                                + "{\n\n");
+                    }
+
+                    //Get methods
+                    Method[] methods = c.getDeclaredMethods();
+
+                    for (Method method:methods) {
+                        this.jTextArea1.append("    " + Modifier.toString(method.getModifiers()) + " " + method.getReturnType().getName() + " " + method.getName() + " (");
+
+                        java.lang.reflect.Type[] ta = method.getParameterTypes();
+
+                        //Print parameters
+                        int count = 1;
+                        for(java.lang.reflect.Type type: ta){
+                            if(count > 1){
+                                this.jTextArea1.append( ", ");
+                            }
+
+                            //Check for String array, cannot use first char as parameter name (will be c nto sa)
+                            if(type.getTypeName().equals("java.lang.String[]")){
+                                this.jTextArea1.append(type.getTypeName() + "  sa" + count);
+                                count++;
+                            }
+
+                            //Get first char for parameter name
+                            else {
+                                this.jTextArea1.append(type.getTypeName() + " " + type.toString().charAt(0) + count);
+                                count++;
+                            }
+                        }
+                        this.jTextArea1.append(")");
+                    }
+                }
+                catch (Exception fileException){
+                    System.out.println(fileException);
+                }
+                catch (NoClassDefFoundError err){}
             }
         }
-
-        return str;
-    }*/
-
-    void classList_actionPerformed(ListSelectionEvent e){
-        String[] str = {"e","2"};
-            this.methodList.setListData(str);
     }
 
     void newObject_actionPerformed(ActionEvent e) {
@@ -264,7 +348,7 @@ public class Frame1 extends JFrame {
 
     }
 
-    void run_actionPerformed(ActionEvent e) {
+    /*void run_actionPerformed(ActionEvent e) {
         int idx = this.methodList.getSelectedIndex();
         Class[] cls = this.mtd[idx].getParameterTypes();
         Object[] obj = this.class2object(cls);
@@ -280,6 +364,6 @@ public class Frame1 extends JFrame {
             System.out.println(var6);
         }
 
-    }
+    }*/
 }
 

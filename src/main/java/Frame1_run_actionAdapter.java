@@ -14,6 +14,6 @@ class Frame1_run_actionAdapter implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent e) {
-        this.adaptee.run_actionPerformed(e);
+        //this.adaptee.run_actionPerformed(e);
     }
 }
