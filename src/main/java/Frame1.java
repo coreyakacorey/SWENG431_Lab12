@@ -3,9 +3,7 @@
 // (powered by FernFlower decompiler)
 //
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -14,7 +12,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 
@@ -67,9 +64,14 @@ public class Frame1 extends JFrame {
             this.jbInit();
 
             JViewport jvp = new JViewport();
-            // TODO: Make method use counters and add those to jvp
-            String methodUseCount = "1\n2\n3\n";// TEST
+
+            String classSkeleton = jTextArea1.getText();
+            ArrayList<Character> methodCounter = processText(classSkeleton);
+
+            // TODO: FIGURE OUT HOW TO CONSTANTLY UPDATE methodUseCount RATHER THAN JUST SHOWING AT THE BEGINNING
+            String methodUseCount = counterListToString(methodCounter);
             JTextArea rowText = new JTextArea(methodUseCount);
+            rowText.setBackground(Color.GRAY);
             jvp.add(rowText);
             jScrollPane3.setRowHeader(jvp);
 
@@ -77,6 +79,35 @@ public class Frame1 extends JFrame {
             var2.printStackTrace();
         }
 
+    }
+
+    String counterListToString(ArrayList<Character> methodCounter){
+        String methodUseCount = "";
+        for (int i=0; i < methodCounter.size(); i++){
+            methodUseCount += methodCounter.get(i); // put array item in string
+            methodUseCount += "\n";                 // new line and move on to next line
+        }
+        return methodUseCount;
+    }
+    ArrayList<Character> processText(String classSkeleton){
+        ArrayList<Character> methodCounter = new ArrayList<Character>();
+        String[] lines = classSkeleton.split("\n");
+
+        // cycle through code skeleton, line by line, to check its contents
+        for(String line : lines){
+            System.out.println(line);
+
+            // line has contents and end in parenthesis, it's a method (right?)
+            if((line.length() > 0) && (line.charAt(line.length()) == ')')){
+                System.out.println("Line is a method");
+                methodCounter.add('0'); // init at zero
+            }
+            else{
+                System.out.println("Line is not a method");
+                methodCounter.add('.');// IN FINAL PRODUCT, LEAVE SPACE. JUST PUTTING "." SO WE HAVE A VISUAL
+            }
+        }
+        return methodCounter;
     }
 
     private void jbInit() throws Exception {
@@ -297,6 +328,7 @@ public class Frame1 extends JFrame {
                                 + "{\n\n");
                     }
 
+                    // TODO: SOME CLASSES ARE PRINTING ALL METHODS ON ONE LINE IN GUI
                     //Get methods
                     Method[] methods = c.getDeclaredMethods();
 
