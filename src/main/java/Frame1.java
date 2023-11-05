@@ -23,9 +23,10 @@ public class Frame1 extends JFrame {
     JMenu jMenuHelp = new JMenu();
     JMenuItem jMenuHelpAbout = new JMenuItem();
     JToolBar jToolBar = new JToolBar();
-    JButton jButton1 = new JButton();
-    JButton jButton2 = new JButton();
-    JButton jButton3 = new JButton();
+    JButton openFileButton = new JButton();
+    JButton closeFileButton = new JButton();
+    JButton helpButton = new JButton();
+    JButton runButton = new JButton();
     ImageIcon image1;
     ImageIcon image2;
     ImageIcon image3;
@@ -52,6 +53,7 @@ public class Frame1 extends JFrame {
     JLabel jLabel3 = new JLabel();
     JScrollPane jScrollPane2 = new JScrollPane();
     JTextArea jTextArea1 = new JTextArea();
+    JTextArea rowText = new JTextArea();
 
     //For trying to clear the JList
     DefaultListModel listModel = new DefaultListModel<>();
@@ -70,7 +72,7 @@ public class Frame1 extends JFrame {
 
             // TODO: FIGURE OUT HOW TO CONSTANTLY UPDATE methodUseCount RATHER THAN JUST SHOWING AT THE BEGINNING
             String methodUseCount = counterListToString(methodCounter);
-            JTextArea rowText = new JTextArea(methodUseCount);
+
             rowText.setBackground(Color.GRAY);
             jvp.add(rowText);
             jScrollPane3.setRowHeader(jvp);
@@ -111,6 +113,9 @@ public class Frame1 extends JFrame {
     }
 
     private void jbInit() throws Exception {
+        this.image1 = new ImageIcon("src/main/resources/openfile.png");
+        this.image2 = new ImageIcon("src/main/resources/closefile.png");
+        this.image3 = new ImageIcon("src/main/resources/help.png");
         this.contentPane = (JPanel)this.getContentPane();
         this.contentPane.setLayout(this.borderLayout1);
         this.contentPane.add(this.jToolBar, "North");
@@ -131,17 +136,21 @@ public class Frame1 extends JFrame {
         this.setJMenuBar(this.jMenuBar1);
 
         // TOOLBAR AND BUTTONS
-        this.jButton1.setIcon(this.image1);
-        this.jButton1.setToolTipText("Open File");
-        this.jButton2.setIcon(this.image2);
-        this.jButton2.setToolTipText("Close File");
-        this.jButton3.setIcon(this.image3);
-        this.jButton3.setToolTipText("Help");
-        this.jToolBar.add(this.jButton1);
-        this.jToolBar.add(this.jButton2);
-        this.jToolBar.add(this.jButton3);
-        this.jToolBar.add(this.jLabel3, (Object)null);
-        this.jToolBar.add(this.jTextField1, (Object)null);
+        this.openFileButton.setIcon(this.image1);
+        this.openFileButton.setToolTipText("Open File");
+        this.openFileButton.addActionListener(new OpenFileButton_Click_actionAdapter(this));
+        this.closeFileButton.setIcon(this.image2);
+        this.closeFileButton.setToolTipText("Close File");
+        this.helpButton.setIcon(this.image3);
+        this.helpButton.setToolTipText("Help");
+        this.runButton.setText("RUN");
+        this.runButton.setToolTipText("RUN");
+        this.jToolBar.add(this.openFileButton);
+        this.jToolBar.add(this.closeFileButton);
+        this.jToolBar.add(this.helpButton);
+        this.jToolBar.add(this.runButton);
+        //this.jToolBar.add(this.jLabel3, (Object)null);
+       //this.jToolBar.add(this.jTextField1, (Object)null);
 
         // TEXT FIELDS
         this.jTextField1.setFont(new Font("Dialog", 0, 20));
@@ -282,8 +291,10 @@ public class Frame1 extends JFrame {
             File f = directoryContents.get(i);
 
             //Check if the file is the correct one
-            Object str = this.classList.getSelectedValue();
-            if(f.getName().contains((String)str))
+            Object selectedClass = this.classList.getSelectedValue();
+            String currentFileClassName = "";
+            currentFileClassName = f.getName().split("\\\\")[0];
+            if(selectedClass.equals(currentFileClassName))
             {
                 //Get the classpath, package and class, and the parent class path
                 while(!f.getName().split("/")[0].contains("classes")){
@@ -315,27 +326,29 @@ public class Frame1 extends JFrame {
                     if(fileName.contains(".")){
                         this.jTextArea1.setText("package " + fileName.split("\\.")[0] + ";\n\n");
                         this.jTextArea1.append(Modifier.toString(c.getModifiers()) + " class " +c.getSimpleName() + "{\n\n");
+                        this.rowText.setText("\n\n");
                     }
                     else
                     {
                         this.jTextArea1.setText(Modifier.toString(c.getModifiers()) + " class " +c.getSimpleName() + "{\n\n");
+                        this.rowText.setText("\n\n");
                     }
 
                     Constructor[] constuctors = c.getDeclaredConstructors();
 
                     for (Constructor contructor:constuctors) {
-                        this.jTextArea1.append("    " + Modifier.toString(contructor.getModifiers()) + " " + contructor.getDeclaringClass().getSimpleName() + "();"
-                                + "{\n\n");
+                        this.jTextArea1.append("    " + Modifier.toString(contructor.getModifiers()) + " " + contructor.getDeclaringClass().getSimpleName() + "() {}\n\n");
+                        this.rowText.append("0\n\n");
                     }
 
-                    // TODO: SOME CLASSES ARE PRINTING ALL METHODS ON ONE LINE IN GUI
                     //Get methods
                     Method[] methods = c.getDeclaredMethods();
 
                     for (Method method:methods) {
-                        this.jTextArea1.append("    " + Modifier.toString(method.getModifiers()) + " " + method.getReturnType().getName() + " " + method.getName() + " (");
+                        this.rowText.append("0\n\n");
+                        this.jTextArea1.append("    " + Modifier.toString(method.getModifiers()) + " " + method.getReturnType().getName() + " " + method.getName() + "() {}\n\n");
 
-                        java.lang.reflect.Type[] ta = method.getParameterTypes();
+                        /*java.lang.reflect.Type[] ta = method.getParameterTypes();
 
                         //Print parameters
                         int count = 1;
@@ -355,9 +368,9 @@ public class Frame1 extends JFrame {
                                 this.jTextArea1.append(type.getTypeName() + " " + type.toString().charAt(0) + count);
                                 count++;
                             }
-                        }
-                        this.jTextArea1.append(")");
+                        }*/
                     }
+                    this.jTextArea1.append("}");
                 }
                 catch (Exception fileException){
                     System.out.println(fileException);
@@ -378,6 +391,10 @@ public class Frame1 extends JFrame {
             System.out.println(var6);
         }
 
+    }
+
+    void opeFile_actionPerformed(ActionEvent e){
+        this.jTextField1_actionPerformed(e);
     }
 
     /*void run_actionPerformed(ActionEvent e) {

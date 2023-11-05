@@ -15,10 +15,12 @@ public class ClassList_click_actionAdapter implements ListSelectionListener {
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        try {
-            this.adaptee.classList_actionPerformed(e);
-        } catch (MalformedURLException ex) {
-            throw new RuntimeException(ex);
+        if(e.getValueIsAdjusting() == true) {
+            try {
+                this.adaptee.classList_actionPerformed(e);
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
+            }
         }
 
     }
