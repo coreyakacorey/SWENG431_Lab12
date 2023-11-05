@@ -39,17 +39,12 @@ public class Frame1 extends JFrame {
     JList classList = new JList();
     JScrollPane jScrollPane3 = new JScrollPane();
     JScrollPane jScrollPane1 = new JScrollPane();
-    //JList methodList = new JList();
     JPanel jPanel2 = new JPanel();
     BorderLayout borderLayout3 = new BorderLayout();
     JPanel jPanel3 = new JPanel();
-    //JButton newObject = new JButton();
-    //JLabel jLabel1 = new JLabel();
     JPanel jPanel4 = new JPanel();
     BorderLayout borderLayout4 = new BorderLayout();
     JPanel jPanel5 = new JPanel();
-    //JLabel jLabel2 = new JLabel();
-    //JButton run = new JButton();
     JLabel jLabel3 = new JLabel();
     JScrollPane jScrollPane2 = new JScrollPane();
     JTextArea jTextArea1 = new JTextArea();
@@ -58,6 +53,10 @@ public class Frame1 extends JFrame {
     //For trying to clear the JList
     DefaultListModel listModel = new DefaultListModel<>();
 
+    /**
+     * Frame constructor:
+     * Calls initializing method to fill frame
+     */
     public Frame1() {
         this.enableEvents(64L);
 
@@ -66,13 +65,6 @@ public class Frame1 extends JFrame {
             this.jbInit();
 
             JViewport jvp = new JViewport();
-
-            String classSkeleton = jTextArea1.getText();
-            ArrayList<Character> methodCounter = processText(classSkeleton);
-
-            // TODO: FIGURE OUT HOW TO CONSTANTLY UPDATE methodUseCount RATHER THAN JUST SHOWING AT THE BEGINNING
-            String methodUseCount = counterListToString(methodCounter);
-
             rowText.setBackground(Color.GRAY);
             jvp.add(rowText);
             jScrollPane3.setRowHeader(jvp);
@@ -83,35 +75,12 @@ public class Frame1 extends JFrame {
 
     }
 
-    String counterListToString(ArrayList<Character> methodCounter){
-        String methodUseCount = "";
-        for (int i=0; i < methodCounter.size(); i++){
-            methodUseCount += methodCounter.get(i); // put array item in string
-            methodUseCount += "\n";                 // new line and move on to next line
-        }
-        return methodUseCount;
-    }
-    ArrayList<Character> processText(String classSkeleton){
-        ArrayList<Character> methodCounter = new ArrayList<Character>();
-        String[] lines = classSkeleton.split("\n");
-
-        // cycle through code skeleton, line by line, to check its contents
-        for(String line : lines){
-            System.out.println(line);
-
-            // line has contents and end in parenthesis, it's a method (right?)
-            if((line.length() > 0) && (line.charAt(line.length()) == ')')){
-                System.out.println("Line is a method");
-                methodCounter.add('0'); // init at zero
-            }
-            else{
-                System.out.println("Line is not a method");
-                methodCounter.add('.');// IN FINAL PRODUCT, LEAVE SPACE. JUST PUTTING "." SO WE HAVE A VISUAL
-            }
-        }
-        return methodCounter;
-    }
-
+    /**
+     * jbInit
+     * Initialized panes, panels, menu, toolbar, buttons, text fields,
+     * lists, and labels needed for GUI frame
+     * @throws Exception
+     */
     private void jbInit() throws Exception {
         this.image1 = new ImageIcon("src/main/resources/openfile.png");
         this.image2 = new ImageIcon("src/main/resources/closefile.png");
@@ -149,8 +118,6 @@ public class Frame1 extends JFrame {
         this.jToolBar.add(this.closeFileButton);
         this.jToolBar.add(this.helpButton);
         this.jToolBar.add(this.runButton);
-        //this.jToolBar.add(this.jLabel3, (Object)null);
-       //this.jToolBar.add(this.jTextField1, (Object)null);
 
         // TEXT FIELDS
         this.jTextField1.setFont(new Font("Dialog", 0, 20));
@@ -163,7 +130,6 @@ public class Frame1 extends JFrame {
         this.classList.setFont(new Font("Dialog", 0, 20));
         this.classList.addListSelectionListener(new ClassList_click_actionAdapter(this));
         this.classList.setModel(listModel);
-        //this.methodList.setFont(new Font("Dialog", 0, 20));
 
         // PANES AND PANELS
         this.jScrollPane1.getViewport().add(this.classList, (Object)null);
@@ -177,43 +143,40 @@ public class Frame1 extends JFrame {
         this.jPanel2.setPreferredSize(new Dimension(258, 163));
         this.jPanel2.add(this.jScrollPane1, "Center");
         this.jPanel2.add(this.jPanel3, "North");
-        //this.jPanel3.add(this.jLabel1, (Object)null);
-        //this.jPanel3.add(this.newObject, (Object)null);
         this.jPanel4.setLayout(this.borderLayout4);
         this.jPanel4.add(this.jScrollPane3, "Center");
         this.jPanel4.add(this.jPanel5, "North");
-        //this.jPanel5.add(this.jLabel2, (Object)null);
-        //this.jPanel5.add(this.run, (Object)null);
         this.jSplitPane1.add(this.jPanel4, "right");
         this.jSplitPane1.add(this.jPanel2, "left");
 
-        // NEW OBJECT
-        //this.newObject.setText("New Object");
-        //this.newObject.addActionListener(new Frame1_newObject_actionAdapter(this));
-
         // LABELS
-        //this.jLabel1.setText("Constructors");
-        //this.jLabel2.setRequestFocusEnabled(true);
-        //this.jLabel2.setText("Methods");
         this.jLabel3.setFont(new Font("Dialog", 0, 20));
         this.jLabel3.setText("   Tested Class:");
 
-        // not sure where these need to go just yet
-       // this.run.setText("Run");
-        //this.run.addActionListener(new Frame1_run_actionAdapter(this));
         this.jTextArea1.setText("");
         this.contentPane.add(this.jSplitPane1, "Center");
-
-
     }
 
+    /**
+     * jMenuFileExit_actionPerformed
+     * Exits on click
+     * @param e
+     */
     public void jMenuFileExit_actionPerformed(ActionEvent e) {
         System.exit(0);
     }
 
+    /**
+     * jMenuHelpAbout_actionPerformed
+     * @param e
+     */
     public void jMenuHelpAbout_actionPerformed(ActionEvent e) {
     }
 
+    /**
+     * processWindowEvent
+     * @param e  the window event
+     */
     protected void processWindowEvent(WindowEvent e) {
         super.processWindowEvent(e);
         if (e.getID() == 201) {
@@ -222,6 +185,12 @@ public class Frame1 extends JFrame {
 
     }
 
+    /**
+     * class2object
+     * creates array of objects from class list
+     * @param cls class array
+     * @return object array
+     */
     private Object[] class2object(Class[] cls) {
         Object[] obj = new Object[cls.length];
 
@@ -236,12 +205,18 @@ public class Frame1 extends JFrame {
                 obj[j] = id1.getObject();
             }
         }
-
         return obj;
     }
 
     //List for class files in the chosen directory
     ArrayList<File> directoryContents = new ArrayList<>();
+
+    /**
+     * jTextField1_actionPerformed
+     * reads in .class files from user-selected directory and stores them
+     * in a file name list
+     * @param e
+     */
     void jTextField1_actionPerformed(ActionEvent e) {
 
         try {
@@ -252,8 +227,6 @@ public class Frame1 extends JFrame {
             //Get only directories
             jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             jfc.setAcceptAllFileFilterUsed(false);
-
-
 
             if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
                 f = jfc.getSelectedFile();
@@ -282,6 +255,12 @@ public class Frame1 extends JFrame {
         }
     }
 
+    /**
+     * classList_actionPerformed
+     * Reads file and creates "skeleton" of class with constructor and other methods
+     * @param e
+     * @throws MalformedURLException
+     */
     void classList_actionPerformed(ListSelectionEvent e) throws MalformedURLException {
         Class c = null;
         ArrayList<String> classPath = new ArrayList<>();
@@ -347,28 +326,6 @@ public class Frame1 extends JFrame {
                     for (Method method:methods) {
                         this.rowText.append("0\n\n");
                         this.jTextArea1.append("    " + Modifier.toString(method.getModifiers()) + " " + method.getReturnType().getName() + " " + method.getName() + "() {}\n\n");
-
-                        /*java.lang.reflect.Type[] ta = method.getParameterTypes();
-
-                        //Print parameters
-                        int count = 1;
-                        for(java.lang.reflect.Type type: ta){
-                            if(count > 1){
-                                this.jTextArea1.append( ", ");
-                            }
-
-                            //Check for String array, cannot use first char as parameter name (will be c nto sa)
-                            if(type.getTypeName().equals("java.lang.String[]")){
-                                this.jTextArea1.append(type.getTypeName() + "  sa" + count);
-                                count++;
-                            }
-
-                            //Get first char for parameter name
-                            else {
-                                this.jTextArea1.append(type.getTypeName() + " " + type.toString().charAt(0) + count);
-                                count++;
-                            }
-                        }*/
                     }
                     this.jTextArea1.append("}");
                 }
@@ -380,6 +337,10 @@ public class Frame1 extends JFrame {
         }
     }
 
+    /**
+     * newObject_actionPerformed
+     * @param e
+     */
     void newObject_actionPerformed(ActionEvent e) {
         int idx = this.classList.getSelectedIndex();
         Class[] cls = this.cons[idx].getParameterTypes();
@@ -393,26 +354,13 @@ public class Frame1 extends JFrame {
 
     }
 
+    /**
+     * opeFile_actionPerformed
+     * @param e
+     */
     void opeFile_actionPerformed(ActionEvent e){
         this.jTextField1_actionPerformed(e);
     }
 
-    /*void run_actionPerformed(ActionEvent e) {
-        int idx = this.methodList.getSelectedIndex();
-        Class[] cls = this.mtd[idx].getParameterTypes();
-        Object[] obj = this.class2object(cls);
-
-        try {
-            Object outcome = this.mtd[idx].invoke(this.obj_exe, obj);
-            if (outcome != null) {
-                this.jTextArea1.append(outcome.toString() + "\n");
-            } else {
-                this.jTextArea1.append("null\n");
-            }
-        } catch (Exception var6) {
-            System.out.println(var6);
-        }
-
-    }*/
 }
 

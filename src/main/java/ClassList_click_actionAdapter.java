@@ -13,6 +13,11 @@ public class ClassList_click_actionAdapter implements ListSelectionListener {
     }
 
 
+    /**
+     * valueChanged
+     * handles change when user selects a list
+     * @param e the event that characterizes the change.
+     */
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if(e.getValueIsAdjusting() == true) {

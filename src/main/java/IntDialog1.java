@@ -13,6 +13,8 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import java.lang.Integer;
+import java.lang.*;
 
 public class IntDialog1 extends JDialog {
     JPanel panel1;
