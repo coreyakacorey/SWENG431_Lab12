@@ -14,6 +14,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 
@@ -55,7 +56,7 @@ public class Frame1 extends JFrame {
     File dir = null;
     File[] farray;
     MyFileNameFilter filter = new MyFileNameFilter();
-    //MyThread mt;
+    MyThread mt;
     URLClassLoader ucl;
     URL[] urls = new URL[1];
     VirtualMachine vm = null;
@@ -294,7 +295,29 @@ public class Frame1 extends JFrame {
      * @throws MalformedURLException
      */
     void classList_actionPerformed(ListSelectionEvent e) throws MalformedURLException {
-        Class c = null;
+
+        int idx = this.classList.getSelectedIndex();
+
+        try {
+            int i = this.farray[idx].getName().indexOf(".class");
+            String cName = this.farray[idx].getName().substring(0, i);
+            Class c = Class.forName(this.dir.getName() + "." + cName, true, this.ucl);
+            ClassSkeleton cs = new ClassSkeleton(c);
+            String[] skelStringArr;
+            if (this.mt != null) {
+                Hashtable ht = this.mt.getHashTable();
+                skelStringArr = cs.getSkeleton(ht);
+            } else {
+                skelStringArr = cs.getSkeleton();
+            }
+
+            this.jTextArea1.setText(skelStringArr[0]);
+            this.rowText.setText(skelStringArr[1] + "\n    ");
+        } catch (Exception var9) {
+            System.out.println(var9);
+        }
+        
+        /* Class c = null;
         ArrayList<String> classPath = new ArrayList<>();
 
         for(int i = 0; i < directoryContents.size(); i++){
@@ -366,7 +389,7 @@ public class Frame1 extends JFrame {
                 }
                 catch (NoClassDefFoundError err){}
             }
-        }
+        }*/
     }
 
     /**
@@ -392,6 +415,28 @@ public class Frame1 extends JFrame {
      */
     void opeFile_actionPerformed(ActionEvent e){
         this.jTextField1_actionPerformed(e);
+    }
+
+    public void updateNumbers() {
+        int idx = this.classList.getSelectedIndex();
+
+        try {
+            int i = this.farray[idx].getName().indexOf(".class");
+            String cName = this.farray[idx].getName().substring(0, i);
+            Class c = Class.forName(this.dir.getName() + "." + cName, true, this.ucl);
+            ClassSkeleton cs = new ClassSkeleton(c);
+            String[] skelStringArr;
+            if (this.mt != null) {
+                Hashtable ht = this.mt.getHashTable();
+                skelStringArr = cs.getSkeleton(ht);
+            } else {
+                skelStringArr = cs.getSkeleton();
+            }
+
+            this.rowText.setText(skelStringArr[1] + "\n    ");
+        } catch (Exception var8) {
+            System.out.println(var8);
+        }
     }
 
 }
