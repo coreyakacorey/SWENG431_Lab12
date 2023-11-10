@@ -3,6 +3,8 @@
 // (powered by FernFlower decompiler)
 //
 
+import com.sun.jdi.VirtualMachine;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
@@ -49,6 +51,14 @@ public class Frame1 extends JFrame {
     JScrollPane jScrollPane2 = new JScrollPane();
     JTextArea jTextArea1 = new JTextArea();
     JTextArea rowText = new JTextArea();
+    JFileChooser chooser = new JFileChooser();
+    File dir = null;
+    File[] farray;
+    MyFileNameFilter filter = new MyFileNameFilter();
+    //MyThread mt;
+    URLClassLoader ucl;
+    URL[] urls = new URL[1];
+    VirtualMachine vm = null;
 
     //For trying to clear the JList
     DefaultListModel listModel = new DefaultListModel<>();
@@ -219,7 +229,29 @@ public class Frame1 extends JFrame {
      */
     void jTextField1_actionPerformed(ActionEvent e) {
 
-        try {
+        this.chooser.setFileSelectionMode(1);
+        int returnVal = this.chooser.showOpenDialog(this);
+        if (returnVal == 0) {
+            this.dir = this.chooser.getSelectedFile();
+            this.farray = this.dir.listFiles(this.filter);
+            DefaultListModel dlm = new DefaultListModel();
+
+            for(int i = 0; i < this.farray.length; ++i) {
+                dlm.add(i, this.farray[i].getName());
+            }
+
+            this.classList.setModel(dlm);
+
+            try {
+                URL u = this.dir.getParentFile().toURL();
+                this.urls[0] = u;
+                this.ucl = new URLClassLoader(this.urls);
+            } catch (Exception var6) {
+                System.out.println(var6);
+            }
+        }
+
+        /*try {
             //Get list of files in directory
             File f;
             JFileChooser jfc = new JFileChooser(this.jTextField1.getText());
@@ -252,7 +284,7 @@ public class Frame1 extends JFrame {
 
         } catch (Exception var7) {
             System.out.println(var7);
-        }
+        }*/
     }
 
     /**
