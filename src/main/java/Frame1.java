@@ -4,11 +4,10 @@
 //
 
 import com.sun.jdi.VirtualMachine;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
-import java.io.File;
+import java.io.*;
 import java.lang.reflect.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,6 +16,32 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
+import com.sun.jdi.Bootstrap;
+import com.sun.jdi.connect.Connector;
+import com.sun.jdi.connect.LaunchingConnector;
+import java.util.Map;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
+import javax.swing.JToolBar;
 
 public class Frame1 extends JFrame {
     JPanel contentPane;
@@ -60,6 +85,7 @@ public class Frame1 extends JFrame {
     URLClassLoader ucl;
     URL[] urls = new URL[1];
     VirtualMachine vm = null;
+    Hashtable hashtable = new Hashtable();
 
     //For trying to clear the JList
     DefaultListModel listModel = new DefaultListModel<>();
@@ -72,16 +98,40 @@ public class Frame1 extends JFrame {
         this.enableEvents(64L);
 
         try {
-
             this.jbInit();
 
             JViewport jvp = new JViewport();
             rowText.setBackground(Color.GRAY);
+            rowText.setText("    ");
             jvp.add(rowText);
             jScrollPane3.setRowHeader(jvp);
 
         } catch (Exception var2) {
             var2.printStackTrace();
+        }
+    }
+
+
+    private void displayRemoteOutput(InputStream stream) {
+        Thread thr;
+        thr = new Thread((Runnable) this, "output reader");
+        thr.setPriority(9);
+        thr.start();
+    }
+
+    private void dumpStream(InputStream stream) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(stream));
+
+        int i;
+        try {
+            while((i = in.read()) != -1) {
+                System.out.print((char)i);
+            }
+        } catch (IOException var6) {
+            String s = var6.getMessage();
+            if (!s.startsWith("Bad file number")) {
+                throw var6;
+            }
         }
 
     }
@@ -125,10 +175,11 @@ public class Frame1 extends JFrame {
         this.helpButton.setToolTipText("Help");
         this.runButton.setText("RUN");
         this.runButton.setToolTipText("RUN");
+        this.runButton.addActionListener(new Frame1_runButton_actionAdapter(this));
         this.jToolBar.add(this.openFileButton);
         this.jToolBar.add(this.closeFileButton);
         this.jToolBar.add(this.helpButton);
-        this.jToolBar.add(this.runButton);
+        this.jToolBar.add(this.runButton, (Object)null);
 
         // TEXT FIELDS
         this.jTextField1.setFont(new Font("Dialog", 0, 20));
@@ -182,6 +233,27 @@ public class Frame1 extends JFrame {
      * @param e
      */
     public void jMenuHelpAbout_actionPerformed(ActionEvent e) {
+    }
+
+    void runButton_actionPerformed(ActionEvent e) {
+        LaunchingConnector lc = Bootstrap.virtualMachineManager().defaultConnector();
+        Map map = lc.defaultArguments();
+        Connector.Argument ca = (Connector.Argument)map.get("main");
+        int idx = this.classList.getSelectedIndex();
+
+        try {
+            int i = this.farray[idx].getName().indexOf(".class");
+            String cName = this.dir.getName() + "." + this.farray[idx].getName().substring(0, i);
+            ca.setValue("-cp \"" + this.dir.getParentFile() + "\" " + cName);
+            this.vm = lc.launch(map);
+            Process process = this.vm.process();
+            this.vm.setDebugTraceMode(0);
+            this.displayRemoteOutput(process.getInputStream());
+            this.mt = new MyThread(this.vm, false, this.dir.getName(), this.farray.length, this);
+        } catch (Exception var9) {
+            System.out.println(e);
+        }
+
     }
 
     /**
@@ -251,41 +323,6 @@ public class Frame1 extends JFrame {
                 System.out.println(var6);
             }
         }
-
-        /*try {
-            //Get list of files in directory
-            File f;
-            JFileChooser jfc = new JFileChooser(this.jTextField1.getText());
-
-            //Get only directories
-            jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            jfc.setAcceptAllFileFilterUsed(false);
-
-            if (jfc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                f = jfc.getSelectedFile();
-
-                //Add file to list if it is a ".class" file only
-                for (File file:f.listFiles()) {
-                    if(file.getName().contains(".class")){
-                        directoryContents.add(file);
-                    }
-                }
-            }
-
-            String[] fileNameList = new String[directoryContents.size()];
-
-            for(int i  = 0; i < fileNameList.length; i++){
-                fileNameList[i] = directoryContents.get(i).getName();
-            }
-
-            //Not sure how to clear the list, this doesn't work
-            this.listModel.clear();
-
-            this.classList.setListData(fileNameList);
-
-        } catch (Exception var7) {
-            System.out.println(var7);
-        }*/
     }
 
     /**
@@ -316,80 +353,7 @@ public class Frame1 extends JFrame {
         } catch (Exception var9) {
             System.out.println(var9);
         }
-        
-        /* Class c = null;
-        ArrayList<String> classPath = new ArrayList<>();
 
-        for(int i = 0; i < directoryContents.size(); i++){
-            //Get file
-            File f = directoryContents.get(i);
-
-            //Check if the file is the correct one
-            Object selectedClass = this.classList.getSelectedValue();
-            String currentFileClassName = "";
-            currentFileClassName = f.getName().split("\\\\")[0];
-            if(selectedClass.equals(currentFileClassName))
-            {
-                //Get the classpath, package and class, and the parent class path
-                while(!f.getName().split("/")[0].contains("classes")){
-                    classPath.add(f.getName().split("/")[0]);
-                    f = f.getParentFile();
-                }
-
-                //Set up the URLClassLoader
-                URL url = f.toURI().toURL();
-                URL[] urla = {url};
-                URLClassLoader ucl = new URLClassLoader(urla);
-
-                String fileName = "";
-
-                //Construct the correct fully qualified class path
-                for(int j = classPath.size(); j > 0; j--){
-                    if(j != 1) {
-                        fileName += classPath.get(j - 1) + ".";
-                    }
-                    else {
-                        fileName += classPath.get(j - 1).split("\\.")[0];
-                    }
-                }
-
-                //Try to open class and get methods
-                try{
-                    c = Class.forName(fileName, true, ucl);
-
-                    if(fileName.contains(".")){
-                        this.jTextArea1.setText("package " + fileName.split("\\.")[0] + ";\n\n");
-                        this.jTextArea1.append(Modifier.toString(c.getModifiers()) + " class " +c.getSimpleName() + "{\n\n");
-                        this.rowText.setText("\n\n");
-                    }
-                    else
-                    {
-                        this.jTextArea1.setText(Modifier.toString(c.getModifiers()) + " class " +c.getSimpleName() + "{\n\n");
-                        this.rowText.setText("\n\n");
-                    }
-
-                    Constructor[] constuctors = c.getDeclaredConstructors();
-
-                    for (Constructor contructor:constuctors) {
-                        this.jTextArea1.append("    " + Modifier.toString(contructor.getModifiers()) + " " + contructor.getDeclaringClass().getSimpleName() + "() {}\n\n");
-                        this.rowText.append("0\n\n");
-                    }
-
-                    //Get methods
-                    Method[] methods = c.getDeclaredMethods();
-
-                    for (Method method:methods) {
-                        this.rowText.append("0\n\n");
-                        this.jTextArea1.append("    " + Modifier.toString(method.getModifiers()) + " " + method.getReturnType().getName() + " " + method.getName() + "() {}\n\n");
-                    }
-                    this.jTextArea1.append("}");
-                }
-                catch (Exception fileException){
-                    System.out.println(fileException);
-                }
-                catch (NoClassDefFoundError err){}
-            }
-        }*/
     }
 
     /**
