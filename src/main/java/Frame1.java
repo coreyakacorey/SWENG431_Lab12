@@ -43,7 +43,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 
-public class Frame1 extends JFrame {
+public class Frame1 extends JFrame{
     JPanel contentPane;
     JMenuBar jMenuBar1 = new JMenuBar();
     JMenu jMenuFile = new JMenu();
@@ -112,11 +112,21 @@ public class Frame1 extends JFrame {
     }
 
 
-    private void displayRemoteOutput(InputStream stream) {
-        Thread thr;
-        thr = new Thread((Runnable) this, "output reader");
-        thr.setPriority(9);
-        thr.start();
+    private void displayRemoteOutput(final InputStream stream) {
+        Thread thr = new Thread("output reader") {
+            public void run() {
+                BufferedReader in = new BufferedReader(new InputStreamReader(stream));
+                int i;
+                try {
+                    while ((i = in.read()) != -1) {
+                        System.out.print((char) i); // Print out standard output
+                    }
+                }
+                catch (IOException ex) {
+                    System.out.println("Failed reading output");
+                }
+            }
+        };
     }
 
     private void dumpStream(InputStream stream) throws IOException {
@@ -247,7 +257,7 @@ public class Frame1 extends JFrame {
             ca.setValue("-cp \"" + this.dir.getParentFile() + "\" " + cName);
             this.vm = lc.launch(map);
             Process process = this.vm.process();
-            this.vm.setDebugTraceMode(0);
+            //this.vm.setDebugTraceMode(0);
             this.displayRemoteOutput(process.getInputStream());
             this.mt = new MyThread(this.vm, false, this.dir.getName(), this.farray.length, this);
         } catch (Exception var9) {
