@@ -11,7 +11,6 @@ import java.util.StringTokenizer;
 
 public class ClassSkeleton {
     Class c;
-    String context = null;
 
     public ClassSkeleton(Class c) {
         this.c = c;

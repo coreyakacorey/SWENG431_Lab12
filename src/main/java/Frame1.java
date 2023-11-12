@@ -59,7 +59,6 @@ public class Frame1 extends JFrame{
     ImageIcon image2;
     ImageIcon image3;
     BorderLayout borderLayout1 = new BorderLayout();
-    Method[] mtd;
     Constructor[] cons;
     Object obj_exe;
     JTextField jTextField1 = new JTextField();
@@ -85,7 +84,6 @@ public class Frame1 extends JFrame{
     URLClassLoader ucl;
     URL[] urls = new URL[1];
     VirtualMachine vm = null;
-    Hashtable hashtable = new Hashtable();
 
     //For trying to clear the JList
     DefaultListModel listModel = new DefaultListModel<>();
@@ -112,6 +110,10 @@ public class Frame1 extends JFrame{
     }
 
 
+    /**
+     * displayRemoteOutput
+     * @param stream
+     */
     private void displayRemoteOutput(final InputStream stream) {
         Thread thr = new Thread("output reader") {
             public void run() {
@@ -129,6 +131,12 @@ public class Frame1 extends JFrame{
         };
     }
 
+    /**
+     * dumpStream
+     *
+     * @param stream
+     * @throws IOException
+     */
     private void dumpStream(InputStream stream) throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 
@@ -245,6 +253,12 @@ public class Frame1 extends JFrame{
     public void jMenuHelpAbout_actionPerformed(ActionEvent e) {
     }
 
+
+    /**
+     * runButton_actionPerformed
+     * Runs the selected method
+     * @param e
+     */
     void runButton_actionPerformed(ActionEvent e) {
         LaunchingConnector lc = Bootstrap.virtualMachineManager().defaultConnector();
         Map map = lc.defaultArguments();
@@ -257,7 +271,7 @@ public class Frame1 extends JFrame{
             ca.setValue("-cp \"" + this.dir.getParentFile() + "\" " + cName);
             this.vm = lc.launch(map);
             Process process = this.vm.process();
-            //this.vm.setDebugTraceMode(0);
+            this.vm.setDebugTraceMode(0);
             this.displayRemoteOutput(process.getInputStream());
             this.mt = new MyThread(this.vm, false, this.dir.getName(), this.farray.length, this);
         } catch (Exception var9) {
@@ -280,7 +294,7 @@ public class Frame1 extends JFrame{
 
     /**
      * class2object
-     * creates array of objects from class list
+     * Creates array of objects from class list
      * @param cls class array
      * @return object array
      */
@@ -288,7 +302,7 @@ public class Frame1 extends JFrame{
         Object[] obj = new Object[cls.length];
 
         for(int j = 0; j < cls.length; ++j) {
-            if (!cls[j].isPrimitive() /*&& cls[j] != (class.java.lang.String == null ? (class$java$lang$String = class$("java.lang.String")) : class$java$lang$String)*/) {
+            if (!cls[j].isPrimitive()) {
                 IntDialog2 id2 = new IntDialog2(cls[j]);
                 id2.setVisible(true);
                 obj[j] = id2.getObject();
@@ -391,6 +405,11 @@ public class Frame1 extends JFrame{
         this.jTextField1_actionPerformed(e);
     }
 
+    /**
+     * updateNumbers
+     * Updated ths number indicating how many times a method has been called
+     *
+     */
     public void updateNumbers() {
         int idx = this.classList.getSelectedIndex();
 
@@ -412,6 +431,5 @@ public class Frame1 extends JFrame{
             System.out.println(var8);
         }
     }
-
 }
 

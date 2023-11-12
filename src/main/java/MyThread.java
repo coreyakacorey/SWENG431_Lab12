@@ -21,8 +21,9 @@ public class MyThread extends Thread {
     boolean connected = true;
     int numClasses;
     String pkgName;
+
     Hashtable ht = new Hashtable(40);
-    Frame1 mainFrame;
+    Frame1 frame;
     ReferenceType rt;
 
     public MyThread(VirtualMachine vm, boolean stopOnVMStart, String pkgName, int numClasses, Frame1 inputFrame) {
@@ -30,7 +31,7 @@ public class MyThread extends Thread {
         this.stopOnVMStart = stopOnVMStart;
         this.numClasses = numClasses;
         this.pkgName = pkgName;
-        this.mainFrame = inputFrame;
+        this.frame = inputFrame;
         this.start();
     }
 
@@ -76,31 +77,28 @@ public class MyThread extends Thread {
             return methodExitEvent(event);
         } else if (event instanceof ClassPrepareEvent) {
 
+            //Get the event and its reference type
             ClassPrepareEvent cpe = (ClassPrepareEvent)event;
             this.rt = cpe.referenceType();
 
             try {
-                List l = this.rt.methods();
-                Object[] o = l.toArray();
+                //Get the methods for the Class
+                List methodList = this.rt.methods();
+                Object[] o = methodList.toArray();
 
                 for(int i = 0; i < o.length; ++i) {
-                    Method met = (Method)o[i];
-                    Location loc = met.location();
-                    BreakpointRequest br = this.vm.eventRequestManager().createBreakpointRequest(loc);
+
+                    //Get the method location
+                    Method method = (Method)o[i];
+                    Location location = method.location();
+
+                    //Create a breakpoint and enable it
+                    BreakpointRequest br = this.vm.eventRequestManager().createBreakpointRequest(location);
                     br.enable();
                 }
             } catch (Exception var9) {
                 System.out.println(var9);
             }
-
-            /*provide code
-             The goal is to utilize the event object to identify methods in
-             the the reference type class. Find the locations of the methods
-             in the code. Use the virtual machine object to set breakpoints
-             for each location and enable them.
-             */
-            //     :
-            //     :
             return classPrepareEvent(event);
         } else if (event instanceof ClassUnloadEvent) {
             return classUnloadEvent(event);
@@ -139,17 +137,8 @@ public class MyThread extends Thread {
 
     @SuppressWarnings("removal")
     private boolean breakpointEvent(Event event) {
-        /* provide code
-           This method is called when a break point is encountered.
-           Take advantage of this break point event to identify the location.
-           The method and class can be identified from the location. Make an
-           update to the number of times of execution for the class's method
-           in real time.
-         */
-        //     :
-        //     :
-        //     :
         BreakpointEvent be = (BreakpointEvent)event;
+
         if(this.ht.containsKey(be.location().method().toString())){
             Integer i = (Integer)this.ht.get(be.location().method().toString());
             int j = i + 1;
@@ -158,7 +147,7 @@ public class MyThread extends Thread {
             this.ht.put(be.location().method().toString(), new Integer(1));
         }
 
-        this.mainFrame.updateNumbers();
+        this.frame.updateNumbers();
         return false;
     }
 
